@@ -1,16 +1,21 @@
 import {  ReactNode, createContext, useContext, useState } from "react";
+import ShoppingCart from "../components/ShoppingCart";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 
-const ShoppingCartContext= createContext({} as ShoppingCartContext)
 
 type ShoppingCartProviderProps = {
     children:ReactNode
 }
 
 type ShoppingCartContext= {
+    openCart:()=>void
+    closeCart:()=>void
     getItemQuantity:(id:number)=> number
     increaseItemQuantity:(id:number)=> void
     decreaseItemQuantity:(id:number)=> void
     removeFromCart:(id:number)=> void
+    cartQuantity:number
+    cartItems:CartItem[]
 }
 
 type CartItem = {
@@ -18,21 +23,30 @@ type CartItem = {
     quantity:number,
 }
 
+const ShoppingCartContext= createContext({} as ShoppingCartContext)
+
+
 export function useShoppingCart() {
     return useContext(ShoppingCartContext)
 }
 
 
 export function ShoppingCartProvider({children}:ShoppingCartProviderProps){
-    const [cartItems, setCartItems]=useState<CartItem[]>([])
+    const [cartItems, setCartItems]=useLocalStorage<CartItem[]>("shopping-cart",[])
+    const [isOpen, setIsOpen]=useState(false)
+
+    const openCart = () => setIsOpen(true)
+    const closeCart = () => setIsOpen(false)
 
     function getItemQuantity(id:number){
         return cartItems.find(item=>item.id===id)?.quantity||0
     }
 
     function increaseItemQuantity(id:number){
+        
         setCartItems(currItems=>{
-            if(currItems.find(item=>item.id===id)===null){
+            if(currItems.find(item=>item.id===id)==null){
+                
                 return [...currItems,{id,quantity:1}]
             }
             else {
@@ -71,9 +85,22 @@ export function ShoppingCartProvider({children}:ShoppingCartProviderProps){
             return currItems.filter(item=>item.id !== id)
         })
     }
+
+    const cartQuantity=cartItems.reduce((quantity,item)=>item.quantity+quantity,0)
+
     return( 
-    <ShoppingCartContext.Provider value={{getItemQuantity,increaseItemQuantity,decreaseItemQuantity,removeFromCart}}>
+    <ShoppingCartContext.Provider 
+    value={{cartItems,
+            cartQuantity,
+            openCart,
+            closeCart,
+            getItemQuantity,
+            increaseItemQuantity,
+            decreaseItemQuantity,
+            removeFromCart
+    }}>
         {children}
+        <ShoppingCart isOpen={isOpen}/>
     </ShoppingCartContext.Provider>
     )
 }

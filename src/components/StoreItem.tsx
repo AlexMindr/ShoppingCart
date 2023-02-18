@@ -32,7 +32,7 @@ export default function StoreItem({id,name,price,imgUrl}:StoreItemProps){
                             <Button onClick={()=>decreaseItemQuantity(id)}>-</Button>
                             <div>
                                 <span className="fs-3">{quantity}</span>
-                                in cart
+                                {` in cart`}
                             </div>
                             <Button onClick={()=>increaseItemQuantity(id)}>+</Button>
                         </div>
