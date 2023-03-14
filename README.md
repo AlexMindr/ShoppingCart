@@ -42,7 +42,7 @@ Items can be removed directly from the cart.
 
 The cart can be accesed from everywhere and is displayed if it has items into the top right corner of the navbar.
 
-![Cart](_readmeimg/cart.png)
+![Cart](_readmeimg/cart.PNG)
 
 ### What I learned?
 
